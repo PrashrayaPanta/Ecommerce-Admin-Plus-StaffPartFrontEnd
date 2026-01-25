@@ -16,7 +16,7 @@ export const Create = () => {
 
   const [brands, setBrands] = useState([]);
 
-  const [loading, setLoading] = useState(false);
+  const [Loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const formik = useFormik({
@@ -28,6 +28,7 @@ export const Create = () => {
       summary: "",
       categoryId: "",
       brandId: "",
+      stock: "",
       images: [],
     },
     validationSchema: Yup.object({
@@ -37,6 +38,12 @@ export const Create = () => {
       price: Yup.number().required(),
       categoryId: Yup.string().required("Category Name is required"),
       brandId: Yup.string().required("Brand Name is required"),
+      stock: Yup.boolean()
+        .transform((value, originalValue) => {
+          if (originalValue === "") return undefined;
+          return originalValue === "true";
+        })
+        .required("Please choose stock status"),
       images: Yup.mixed()
         .test("count", "select atleast one file", (files) => files.length > 0)
         .test("type", "select valid image files", (files) => {
@@ -80,18 +87,49 @@ export const Create = () => {
     },
   });
 
+  // const getPromiseCatgeioriesData = () => {
+  //   return http.get("/api/cms/categories");
+  // };
+
+  // const getPromiseBrandsData = () => {
+  //   return http.get("/api/cms/brands");
+  // };
+
+  // const getPromiesCategoriesPlusBrandData = async () => {
+  //   const promise = await Promise.all([
+  //     getPromiseCatgeioriesData(),
+  //     getPromiseBrandsData(),
+  //   ]);
+  //   return promise;
+  // };
+
+  // console.log(getPromiesCategoriesPlusBrandData());
+
   useEffect(() => {
     setLoading(true);
+
+    //   getPromiesCategoriesPlusBrandData().then((data) => {
+    //     console.log(data);
+    //   });
+
+    // setLoading(false);
+    // const startTime = performance.now() / 1000;
+    // console.log("Started hititng the request at", startTime);
+
     http
       .get("/api/cms/categories")
       .then(({ data }) => {
+        console.log(data);
         setCategories(data.data);
+        console.log(performance.now() / 1000);
         return http.get("/api/cms/brands");
       })
       .then(({ data }) => setBrands(data.data))
       .catch()
       .finally(() => setLoading(false));
   }, []);
+
+  console.log(formik.values.stock);
 
   // console.log(categories);
 
@@ -103,7 +141,7 @@ export const Create = () => {
             sm="12"
             className="bg-white rounded-2 shadow-sm py-3 my-3 mx-auto"
           >
-            {loading ? (
+            {Loading ? (
               <LoadingComponent />
             ) : (
               <>
@@ -175,7 +213,7 @@ export const Create = () => {
                           onBlur={formik.handleBlur}
                         >
                           <option>Select Category</option>
-                          {categories?.map((category, index) => (
+                          {categories.map((category) => (
                             <option value={category._id} key={category._id}>
                               {category.name}
                             </option>
@@ -230,6 +268,47 @@ export const Create = () => {
                         {formik.errors.brandId && (
                           <Form.Control.Feedback type="invalid">
                             {formik.errors.brandId}
+                          </Form.Control.Feedback>
+                        )}
+                      </div>
+
+                      {/* Stock */}
+                      <div className="mb-2">
+                        <Form.Label htmlFor="brandId">Stock</Form.Label>
+                        <svg
+                          stroke="currentColor"
+                          fill="none"
+                          stroke-width="2"
+                          viewBox="0 0 24 24"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="text-danger mb-2"
+                          height="18"
+                          width="18"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M12 6v12"></path>
+                          <path d="M17.196 9 6.804 15"></path>
+                          <path d="m6.804 9 10.392 6"></path>
+                        </svg>
+                        <Form.Select
+                          name="stock"
+                          id="stock"
+                          value={formik.values.stock}
+                          isValid={formik.values.stock && !formik.errors.stock}
+                          isInvalid={
+                            formik.touched.stock && formik.errors.stock
+                          }
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                        >
+                          <option value="">Stock Status</option>
+                          <option value="true">Active</option>
+                          <option value="false">Inactive</option>
+                        </Form.Select>
+                        {formik.errors.stock && (
+                          <Form.Control.Feedback type="invalid">
+                            {formik.errors.stock}
                           </Form.Control.Feedback>
                         )}
                       </div>

@@ -39,6 +39,8 @@ export const List = () => {
     }
   };
 
+  console.log(products);
+
   return (
     <Container>
       <Row>
@@ -72,6 +74,7 @@ export const List = () => {
                       <th>Image</th>
                       <th>Category</th>
                       <th>Brand</th>
+                      <th>Stock</th>
                       <th>Original Price</th>
                       <th>Price</th>
                       <th>Created At</th>
@@ -94,7 +97,7 @@ export const List = () => {
                             >
                               <img
                                 src={imgURLForProduct(
-                                  product.images[0]?.public_id
+                                  product?.images[0]?.public_id
                                 )}
                                 className="img-sm"
                                 alt="Product"
@@ -102,12 +105,17 @@ export const List = () => {
                             </a>
                           )}
                         </td>
-                        <td>{product.categoryName}</td>
-                        <td>{product.brandName}</td>
+                        <td>{product?.categoryName}</td>
+                        <td>{product?.brandName}</td>
+                        <td>
+                          {product?.stock == true
+                            ? "Product Availabel"
+                            : "Not Avaiable"}
+                        </td>
                         <td>Rs {product.originalPrice}</td>
                         <td>Rs {product.price}</td>
-                        <td>{dtFormat(product.createdAt)}</td>
-                        <td>{dtFormat(product.updatedAt)}</td>
+                        <td>{dtFormat(product?.createdAt)}</td>
+                        <td>{dtFormat(product?.updatedAt)}</td>
                         <td>
                           <Link
                             className="btn btn-dark btn-sm me-2"

@@ -38,6 +38,7 @@ export const Edit = () => {
       price: "",
       categoryId: "",
       brandId: "",
+      stock: "",
       images: [],
     },
     validationSchema: Yup.object({
@@ -47,6 +48,7 @@ export const Edit = () => {
       price: Yup.number().required(),
       categoryId: Yup.string().required("Category Name is required"),
       brandId: Yup.string().required("Brand Name is required"),
+      stock: Yup.string().required("Stock required"),
       images: Yup.mixed()
         .nullable()
         .test("type", "select valid image files", (files) => {
@@ -114,6 +116,7 @@ export const Edit = () => {
       getCatgeoriesData();
       getBrandsData();
     } catch (error) {
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -140,6 +143,7 @@ export const Edit = () => {
       const { data } = await http.get(`/api/cms/products/${slug}`);
       setProduct(data.product);
     } catch (error) {
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -180,12 +184,15 @@ export const Edit = () => {
       const { data } = await http.get(`/api/cms/products/${slug}`);
       setProduct(data.product);
     } catch (error) {
+      console.log(error);
     } finally {
       setLoading(false);
     }
   };
 
   // console.log(product);
+
+  console.log(formik.values.stock);
 
   // console.log(categories);
 
@@ -230,7 +237,7 @@ export const Edit = () => {
                         formik={formik}
                         as="textarea"
                       />
-
+                      {/* Category */}
                       <div className="mb-2">
                         <Form.Label htmlFor="categoryId">Category</Form.Label>
                         <Form.Select
@@ -261,7 +268,7 @@ export const Edit = () => {
                           </Form.Control.Feedback>
                         )}
                       </div>
-
+                      {/* Brand */}
                       <div className="mb-2">
                         <Form.Label htmlFor="brandId">Brand</Form.Label>
                         <Form.Select
@@ -287,6 +294,47 @@ export const Edit = () => {
                         {formik.errors.brandId && (
                           <Form.Control.Feedback type="invalid">
                             {formik.errors.brandId}
+                          </Form.Control.Feedback>
+                        )}
+                      </div>
+
+                      {/* Stock */}
+                      <div className="mb-2">
+                        <Form.Label htmlFor="brandId">Stock</Form.Label>
+                        <svg
+                          stroke="currentColor"
+                          fill="none"
+                          stroke-width="2"
+                          viewBox="0 0 24 24"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="text-danger mb-2"
+                          height="18"
+                          width="18"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M12 6v12"></path>
+                          <path d="M17.196 9 6.804 15"></path>
+                          <path d="m6.804 9 10.392 6"></path>
+                        </svg>
+                        <Form.Select
+                          name="stock"
+                          id="stock"
+                          value={formik.values.stock}
+                          isValid={formik.values.stock && !formik.errors.stock}
+                          isInvalid={
+                            formik.touched.stock && formik.errors.stock
+                          }
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                        >
+                          <option>Stock Status</option>
+                          <option value="true">Active</option>
+                          <option value="false">Inactive</option>
+                        </Form.Select>
+                        {formik.errors.stock && (
+                          <Form.Control.Feedback type="invalid">
+                            {formik.errors.stock}
                           </Form.Control.Feedback>
                         )}
                       </div>
