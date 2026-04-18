@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, Col, Container, Row, Table } from "react-bootstrap";
 import { LoadingComponent } from "../../components";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import http from "../../http";
 import { dtFormat, imgURLForBrand } from "../../library";
+
+import Pagination from 'react-bootstrap/Pagination'
+
+
 
 import "./List.css";
 
@@ -12,11 +16,32 @@ const List = () => {
 
   const [brands, setbrands] = useState([]);
 
-  const getBrands = async () => {
+
+  const [totalItems, setTotalItems] = useState("");
+
+  const [totalPages, setTotalPages] = useState("");
+
+  const { search } = useLocation();
+
+
+  const onlyPage = search?.split("&")[0]?.split("=")[1];
+
+  const onlyLimit = search?.split("&")[1]?.split("=")[1];
+
+
+
+
+  const navigate = useNavigate();
+
+
+
+  const getThatMuchBrands = async () => {
     try {
       setLoading(true);
-      const { data } = await http.get("/api/cms/brands");
-      setbrands(data.data);
+      const { data } = await http.get(`/api/cms/brands?page=${onlyPage}&limit=${onlyLimit}`);
+      setTotalPages(data.result.totalPages);
+      setTotalItems(data.result.totalItems);
+      setbrands(data.result.data);
     } catch (error) {
       console.log(error);
     } finally {
@@ -25,8 +50,8 @@ const List = () => {
   };
 
   useEffect(() => {
-    getBrands();
-  }, []);
+    getThatMuchBrands()
+  }, [onlyPage, onlyLimit]);
 
   console.log(brands);
 
@@ -38,9 +63,9 @@ const List = () => {
     try {
       await http.delete(`/api/cms/brands/${id}`);
 
-      const { data } = await http.get("/api/cms/brands");
+      const { data } = await http.get(`/api/cms/brands?page=${onlyPage}&limit=${onlyLimit}`);
 
-      setbrands(data.data);
+      setbrands(data.result.data);
     } catch (error) {
     } finally {
       setLoading(false);
@@ -76,7 +101,7 @@ const List = () => {
                 </Row>
                 <Row>
                   <Col>
-                    {brands.length > 0 ? (
+                    {brands?.length > 0 ? (
                       <Table bordered hover size="sm">
                         <thead className="table-dark">
                           <tr>
@@ -130,7 +155,7 @@ const List = () => {
                         </tbody>
                       </Table>
                     ) : (
-                      <h4 className="text-muted">No categorys</h4>
+                      <h4 className="text-muted">No Brand</h4>
                     )}
                   </Col>
                 </Row>
@@ -144,7 +169,57 @@ const List = () => {
           </Col>
         </Row>
       </Container>
+
+      {
+
+        <Container>
+          <Row>
+            <Col xs="12">
+              {
+                loading ? <LoadingComponent /> : <>
+
+
+                  <Row>
+                    <Col>
+                      {
+                        brands.length > 0 && <Pagination>
+                          {/* <Pagination.First /> */}
+                          <Pagination.Prev />
+                          {
+                            [...Array(totalPages)].map((_, index) => (
+                              <Pagination.Item onClick={() => navigate(`/brand?page=${index + 1}&limit=${4}`)}>{index + 1}</Pagination.Item>
+                            ))
+                          }
+
+                          <Pagination.Next />
+                          {/* <Pagination.Last /> */}
+                        </Pagination>
+
+                      }
+                    </Col>
+
+                  </Row>
+
+                </>
+
+              }
+
+
+            </Col>
+
+
+          </Row>
+
+        </Container>
+
+
+      }
+
+
+
+
     </div>
+
   );
 };
 

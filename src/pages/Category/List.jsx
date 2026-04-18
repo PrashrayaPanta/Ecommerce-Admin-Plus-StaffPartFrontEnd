@@ -1,19 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { Button, Col, Container, Row, Table } from "react-bootstrap";
 import { LoadingComponent } from "../../components";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import http from "../../http";
 import { dtFormat } from "../../library";
+
+
+import Pagination from 'react-bootstrap/Pagination'
+
 
 const List = () => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
 
-  const getCategories = async () => {
+  const [totalItems, setTotalItems] = useState("");
+
+  const [totalPages, setTotalPages] = useState("");
+
+  const { search } = useLocation();
+
+
+  const onlyPage = search?.split("&")[0]?.split("=")[1];
+
+  const onlyLimit = search?.split("&")[1]?.split("=")[1];
+
+  const navigate = useNavigate();
+
+  const getThatMuchCategories = async () => {
     try {
       setLoading(true);
-      const { data } = await http.get("/api/cms/categories");
-      setCategories(data.data);
+      const { data } = await http.get(`/api/cms/categories?page=${onlyPage}&limit=${onlyLimit}`);
+      setTotalPages(data.result?.totalPages);
+      setTotalItems(data.result?.totalItems);
+      setCategories(data.result?.data);
     } catch (error) {
       console.log(error);
     } finally {
@@ -22,17 +41,16 @@ const List = () => {
   };
 
   useEffect(() => {
-    getCategories();
-  }, []);
+    getThatMuchCategories()
+  }, [onlyPage, onlyLimit]);
 
-  console.log(categories);
 
   const handleDelete = async (slug) => {
     try {
       setLoading(true);
       await http.delete(`/api/cms/categories/${slug}`);
-      const { data } = await http.get("/api/cms/categories");
-      setCategories(data.data);
+      const { data } = await http.get(`/api/cms/categories?page=${onlyPage}&limit=${onlyLimit}`);
+      setCategories(data.result.data);
     } catch (error) {
     } finally {
       setLoading(false);
@@ -114,6 +132,35 @@ const List = () => {
           </Col>
         </Row>
       </Container>
+
+      {
+        categories.length > 0 && (
+          <Container>
+            <Row>
+              <Col>
+                <Pagination>
+                  {/* <Pagination.First /> */}
+                  <Pagination.Prev />
+                  {
+                    [...Array(totalPages)].map((_, index) => (
+                      <Pagination.Item onClick={() => navigate(`/category?page=${index + 1}&limit=${4}`)}>{index + 1}</Pagination.Item>
+                    ))
+                  }
+
+                  <Pagination.Next />
+                  {/* <Pagination.Last /> */}
+                </Pagination>
+
+              </Col>
+
+
+            </Row>
+
+          </Container>)
+      }
+
+
+
     </div>
   );
 };
