@@ -24,6 +24,7 @@ const Create = () => {
           await http.post("/api/cms/categories", data);
           navigate("/category");
         } catch (error) {
+          console.log(error);
         } finally {
           setSubmitting(false);
         }

@@ -256,7 +256,7 @@ export const Edit = () => {
                           onBlur={formik.handleBlur}
                         >
                           <option>Select Category</option>
-                          {categories.map((category, index) => (
+                          {categories?.map((category, index) => (
                             <option value={category._id} key={category._id}>
                               {category.name}
                             </option>
@@ -329,8 +329,8 @@ export const Edit = () => {
                           onBlur={formik.handleBlur}
                         >
                           <option>Stock Status</option>
-                          <option value="true">Active</option>
-                          <option value="false">Inactive</option>
+                          <option value="active">Active</option>
+                          <option value="Inactive">Inactive</option>
                         </Form.Select>
                         {formik.errors.stock && (
                           <Form.Control.Feedback type="invalid">
@@ -338,6 +338,8 @@ export const Edit = () => {
                           </Form.Control.Feedback>
                         )}
                       </div>
+
+                      {/* Images */}
 
                       <div className="mb-2">
                         <Form.Label htmlFor="images">Images</Form.Label>
@@ -388,7 +390,7 @@ export const Edit = () => {
                         <Row>
                           {product?.images?.map((image, i) => (
                             <Col xs="3" className="mt-3">
-                              <Row>
+                              <Row key={i}>
                                 <Col>
                                   <img
                                     src={imgURLForProduct(image?.public_id)}
@@ -417,6 +419,7 @@ export const Edit = () => {
                           ))}
                         </Row>
                       </div>
+
                       <InputField
                         type="text"
                         label="Initial Price"

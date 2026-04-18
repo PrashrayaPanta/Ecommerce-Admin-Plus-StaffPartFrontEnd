@@ -3,6 +3,7 @@ import { Button, Col, Container, Form, Row, Table } from "react-bootstrap";
 import http from "../../http";
 import { LoadingComponent } from "../../components";
 import { dtFormat } from "../../library";
+import { Link } from "react-router-dom"
 
 const List = () => {
   const [loading, setLoading] = useState(true);
@@ -97,8 +98,7 @@ const List = () => {
                           <th>Order By Email</th>
 
                           <th>Order Product Name</th>
-                          <th>Quantity</th>
-                          <th>Total Price</th>
+
 
                           <th>status</th>
 
@@ -110,6 +110,7 @@ const List = () => {
                       </thead>
                       <tbody>
                         {orders.map((order, index) => (
+
                           <tr
                             key={order._id}
                             className={
@@ -122,20 +123,6 @@ const List = () => {
                               {order.items
                                 .map((item) => item.product_id?.name)
                                 .join(", ")}
-                            </td>
-                            <td>
-                              {order.items
-                                .map((item) => item.quantity)
-                                .reduce((a, b) => a + b, 0)}
-                            </td>
-                            <td>
-                              Rs.{" "}
-                              {order.items.reduce(
-                                (total, item) =>
-                                  total +
-                                  item.quantity * (item.product_id?.price || 0),
-                                0
-                              )}
                             </td>
                             <td>
                               <Form.Select
@@ -155,6 +142,13 @@ const List = () => {
                             <td>{dtFormat(order.createdAt)}</td>
                             <td>{dtFormat(order.updatedAt)}</td>
                             <td>
+
+                              <Link
+                                className="btn btn-dark btn-sm me-2"
+                                to={`/order/${order._id}`}
+                              >
+                                <i class="fa-solid fa-circle-info"></i>Details
+                              </Link>
                               <Button
                                 variant="danger"
                                 size="sm"
@@ -165,6 +159,7 @@ const List = () => {
                               </Button>
                             </td>
                           </tr>
+
                         ))}
                       </tbody>
                     </Table>

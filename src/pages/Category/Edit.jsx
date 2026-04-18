@@ -24,39 +24,22 @@ const Edit = () => {
       name: "",
     },
     validationSchema: Yup.object({
-      name: Yup.string().required(),
+      name: Yup.string().required("Name is required"),
     }),
-    onSubmit: (values, { setSubmitting }) => {
-      console.log(values);
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        const { data } = await http.put(
+          `/api/cms/categories/${slug}`,
+          values
+        );
 
-      const CategoryEditData = async () => {
-        try {
-          const { data } = await http.put(
-            `/api/admin/categories/${slug}`,
-            values
-          );
-
-          // console.log(data);
-
-          setCategory(data.data);
-          navigate("/category");
-        } catch (error) {
-        } finally {
-          setSubmitting(false);
-        }
-      };
-
-      CategoryEditData();
-
-      // http
-      //   .put(`/api/admin/categories/${slug}`, data)
-      //   .then(({ data }) => {
-      //     setCategory(data.data);
-
-      //     navigate("/category");
-      //   })
-      //   .catch()
-      //   .finally(() => setSubmitting(false));
+        setCategory(data.data);
+        navigate("/category");
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setSubmitting(false);
+      }
     },
   });
 
@@ -66,9 +49,12 @@ const Edit = () => {
     const getCatgeoryData = async () => {
       setLoading(true);
       try {
-        const { data } = await http.get(`/api/admin/categories/${slug}`);
+        const { data } = await http.get(`/api/cms/categories/${slug}`);
+        console.log(data);
+        
         setCategory(data.data);
       } catch (error) {
+        console.log(error);
       } finally {
         setLoading(false);
       }

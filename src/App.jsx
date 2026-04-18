@@ -4,7 +4,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import PrivateRoute from "./Routes/PrivateRoute";
 
 import Layout from "./components/Layout";
-import * as Pages from "./pages";
+import * as Pages from "./Pages";
 import { AdminRoute } from "./Routes/AdminRoute";
 
 // import { List } from "./pages/Staff";
@@ -149,6 +149,7 @@ function App() {
             <Route path="order" element={<PrivateRoute element={<Outlet />} />}>
               <Route index element={<Pages.Order.List />} />
               <Route path="create" element={<Pages.Order.Create />} />
+              <Route path=":id" element={<Pages.Order.OrderDetails />} />
             </Route>
           </Route>
         </Routes>

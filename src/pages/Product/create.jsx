@@ -38,12 +38,7 @@ export const Create = () => {
       price: Yup.number().required(),
       categoryId: Yup.string().required("Category Name is required"),
       brandId: Yup.string().required("Brand Name is required"),
-      stock: Yup.boolean()
-        .transform((value, originalValue) => {
-          if (originalValue === "") return undefined;
-          return originalValue === "true";
-        })
-        .required("Please choose stock status"),
+      stock: Yup.string().required("Please choose stock status"),
       images: Yup.mixed()
         .test("count", "select atleast one file", (files) => files.length > 0)
         .test("type", "select valid image files", (files) => {
@@ -87,6 +82,9 @@ export const Create = () => {
     },
   });
 
+  console.log("I am the value that is being typing stated ", formik);
+  
+
   // const getPromiseCatgeioriesData = () => {
   //   return http.get("/api/cms/categories");
   // };
@@ -105,10 +103,7 @@ export const Create = () => {
 
   // console.log(getPromiesCategoriesPlusBrandData());
 
-  useEffect(() => {
-    setLoading(true);
 
-    //   getPromiesCategoriesPlusBrandData().then((data) => {
     //     console.log(data);
     //   });
 
@@ -116,22 +111,134 @@ export const Create = () => {
     // const startTime = performance.now() / 1000;
     // console.log("Started hititng the request at", startTime);
 
-    http
-      .get("/api/cms/categories")
-      .then(({ data }) => {
-        console.log(data);
-        setCategories(data.data);
-        console.log(performance.now() / 1000);
-        return http.get("/api/cms/brands");
-      })
-      .then(({ data }) => setBrands(data.data))
-      .catch()
-      .finally(() => setLoading(false));
-  }, []);
 
-  console.log(formik.values.stock);
+  //   http
+  //     .get("/api/categories")
+  //     .then(({ data }) => {
+  //       console.log(data);
+  //       setCategories(data.data);
+  //       console.log(performance.now() / 1000);
+  //       return http.get("/api/brands");
+  //     })
+  //     .then(({ data }) => {
+  //       console.log(data);
+  //       setBrands(data.data)
+  //     })  
+  //     .catch()
+  //     .finally(() => {
+  //       setLoading(false)
+  //        console.timeEnd("categories and brands");
+  //     });
+  // }, []);
 
-  // console.log(categories);
+
+  // const getCategoriesPlusBrands = async () => {
+
+  //   console.time("categories and brands");
+
+  //   try {
+  //     setLoading(true);
+
+  //     const categoriesData = await http.get("/api/categories");
+
+  //     setCategories(categoriesData.data.data);
+
+  //     const {data} = await http.get("/api/brands");
+      
+
+  //     setBrands(data.data);
+
+
+
+
+
+  //   } catch (error) {
+
+  //     console.log(error);
+      
+
+  //   } finally {
+
+  //     setLoading(false);
+
+  //     console.timeEnd("categories and brands");
+
+
+  //   }
+
+
+  // }
+
+
+  const getCategoriesDta = () => {
+    return http.get("/api/categories");
+  }
+
+
+  const getBrandsDta = () => {
+    return http.get("/api/brands");
+  }
+
+
+  const getCategoriesPlusBrandsData = async () => {
+
+    console.time("categories and brands");
+
+    try {
+
+
+      const data = await Promise.all([getCategoriesDta(), getBrandsDta()]);
+    
+      setCategories(data[0].data.data);
+
+
+      setBrands(data[1].data.data);
+    
+      
+    } catch (error) {
+      
+      console.log(error);
+      
+
+    } finally {
+      setLoading(false)
+      console.timeEnd("categories and brands");
+    }
+
+
+
+
+    
+    
+
+  
+    
+
+
+  
+
+
+    // console.log(promise);
+
+
+    
+
+
+
+
+    // console.log(promise);
+    
+
+
+  }
+
+
+  useEffect(() => {
+    getCategoriesPlusBrandsData()
+  }, [])
+
+
+
 
   return (
     <>
@@ -303,8 +410,8 @@ export const Create = () => {
                           onBlur={formik.handleBlur}
                         >
                           <option value="">Stock Status</option>
-                          <option value="true">Active</option>
-                          <option value="false">Inactive</option>
+                          <option value="active">Active</option>
+                          <option value="Inactive">Inactive</option>
                         </Form.Select>
                         {formik.errors.stock && (
                           <Form.Control.Feedback type="invalid">

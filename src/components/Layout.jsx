@@ -22,7 +22,7 @@ const Layout = () => {
         http
           .get("/api/users/profile")
           .then(({ data }) => dispatch(setUser(data.user)))
-          .catch(() => {})
+          .catch(() => { })
           .finally(() => setLoading(false));
       } else {
         setLoading(false);
